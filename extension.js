@@ -2,6 +2,8 @@
 const vscode = require('vscode');
 // Import webview content generator
 const { getWebviewContent } = require('./src/ui/webview');
+// Import file discovery functionality
+const { discoverViewViewModelPairs } = require('./src/data/fileDiscovery');
 
 /**
  * This function is called when the extension is activated
@@ -29,12 +31,31 @@ function activate(context) {
 
 		// Listen for messages sent from the webview (like button clicks)
 		panel.webview.onDidReceiveMessage(
-			message => {
+			async message => {
 				switch (message.command) {
 					case 'analyze':
-						// This will be triggered when user clicks the Analyze button
-						// For now, just show a placeholder message
-						vscode.window.showInformationMessage('Analysis functionality will be implemented soon!');
+						try {
+							// Discover View-ViewModel pairs in the current workspace
+							console.log('Starting MVVM architecture analysis...');
+							const pairs = await discoverViewViewModelPairs();
+							
+							// Show results in an information message for now
+							const pairCount = pairs.length;
+							const viewModelCount = pairs.filter(p => p.viewModel).length;
+							const unpairedCount = pairCount - viewModelCount;
+							
+							const message = `Analysis complete! Found ${pairCount} Views, ${viewModelCount} with ViewModels, ${unpairedCount} without ViewModels.`;
+							vscode.window.showInformationMessage(message);
+							
+							// Log detailed results to console
+							console.log(`Analysis results: ${pairCount} total Views`);
+							console.log(`${viewModelCount} Views have matching ViewModels`);
+							console.log(`${unpairedCount} Views are missing ViewModels`);
+							
+						} catch (error) {
+							console.error('Error during analysis:', error);
+							vscode.window.showErrorMessage(`Analysis failed: ${error.message}`);
+						}
 						return;
 				}
 			},
