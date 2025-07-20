@@ -30,6 +30,9 @@ private-config.json
 vsc-extension-quickstart.md
 .vscode-test.mjs
 
+# Claude AI context file (contains project-specific info)
+CLAUDE.md
+
 # ====================
 # NODE.JS
 # ====================
