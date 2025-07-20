@@ -12,7 +12,7 @@ CodeVibez helps Swift developers maintain clean MVVM architecture by automatical
 - **MVVM Compliance**: Checks proper separation between Views and ViewModels
 - **Grades and Feedback**: Grading and feedback of files and overall summary
 
-## Installation
+## Installation and Setup
 
 1. Clone this repository
 2. Run `npm install` to install dependencies
@@ -37,11 +37,11 @@ CodeVibez helps Swift developers maintain clean MVVM architecture by automatical
 5. **Progressive Display**: Shows results in real-time as each file analysis completes
 6. **Summary Generation**: Provides overall project grade and recommendations
 
-## Requirements
+## Project Status
 
-- VS Code 1.60.0 or higher
-- Node.js 14 or higher
-- Claude API key from Anthropic
+This is a **proof of concept** and is far from ready for production use. The extension demonstrates the core functionality of MVVM architecture analysis using Claude AI, but there's significant room for improvement and additional features.
+
+Anyone interested in bringing this project to the next level is more than welcome to contribute! Whether you want to add new features, improve the analysis accuracy, enhance the UI, or help with testing and documentation - all contributions are appreciated.
 
 ## License
 
