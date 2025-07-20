@@ -66,10 +66,22 @@ function activate(context) {
 									command: 'llmAnalysisStarted'
 								});
 								
-								// Analyze all selected files with summary
-								const analysisWithSummary = await analyzeBatchWithSummary(selectedFiles);
+								// Analyze all selected files with progressive results
+								const analysisWithSummary = await analyzeBatchWithSummary(selectedFiles, (fileResult, completed, total) => {
+									// Send individual result immediately when completed
+									panel.webview.postMessage({
+										command: 'llmFileComplete',
+										data: {
+											result: fileResult,
+											progress: {
+												completed,
+												total
+											}
+										}
+									});
+								});
 								
-								// Send LLM results to webview
+								// Send final completion message
 								panel.webview.postMessage({
 									command: 'llmAnalysisComplete',
 									data: analysisWithSummary.results

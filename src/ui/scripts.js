@@ -138,24 +138,67 @@ function getWebviewScripts() {
         }
 
         /**
-         * Display LLM analysis results for multiple files
+         * Add individual file result to the display
+         */
+        function addLlmFileResult(data) {
+            const llmAnalysis = document.getElementById('llmAnalysis');
+            const result = data.result;
+            const progress = data.progress;
+            
+            // Update loading message with progress
+            const loadingDiv = llmAnalysis.querySelector('.llm-loading');
+            if (loadingDiv) {
+                loadingDiv.textContent = \`Analyzing code... (\${progress.completed}/\${progress.total} completed)\`;
+            }
+            
+            // Create or update results container
+            let resultsContainer = llmAnalysis.querySelector('.llm-results-progressive');
+            if (!resultsContainer) {
+                resultsContainer = document.createElement('div');
+                resultsContainer.className = 'llm-results-progressive';
+                llmAnalysis.appendChild(resultsContainer);
+            }
+            
+            // Add the new result
+            const resultHtml = \`
+                <div class="llm-result">
+                    <div class="llm-file-name">\${result.fileName}\${result.viewModelName ? \` + \${result.viewModelName}\` : ''}</div>
+                    <div class="llm-grade">Grade: \${result.grade}/10</div>
+                    <div class="llm-comment">\${result.comment}</div>
+                </div>
+            \`;
+            resultsContainer.insertAdjacentHTML('beforeend', resultHtml);
+        }
+
+        /**
+         * Display LLM analysis results for multiple files (final completion)
          */
         function displayLlmResults(llmResults) {
             const llmAnalysis = document.getElementById('llmAnalysis');
             
-            if (Array.isArray(llmResults) && llmResults.length > 0) {
-                const resultsHtml = llmResults.map(result => {
-                    return \`
-                        <div class="llm-result">
-                            <div class="llm-file-name">\${result.fileName}\${result.viewModelName ? \` + \${result.viewModelName}\` : ''}</div>
-                            <div class="llm-grade">Grade: \${result.grade}/10</div>
-                            <div class="llm-comment">\${result.comment}</div>
-                        </div>
-                    \`;
-                }).join('');
-                llmAnalysis.innerHTML = resultsHtml;
-            } else {
-                llmAnalysis.innerHTML = '<div class="llm-loading">No files analyzed</div>';
+            // Remove loading message
+            const loadingDiv = llmAnalysis.querySelector('.llm-loading');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+            
+            // Progressive results should already be displayed, so this is just cleanup
+            // Ensure all results are shown in case there were any issues with progressive updates
+            if (!llmAnalysis.querySelector('.llm-results-progressive')) {
+                if (Array.isArray(llmResults) && llmResults.length > 0) {
+                    const resultsHtml = llmResults.map(result => {
+                        return \`
+                            <div class="llm-result">
+                                <div class="llm-file-name">\${result.fileName}\${result.viewModelName ? \` + \${result.viewModelName}\` : ''}</div>
+                                <div class="llm-grade">Grade: \${result.grade}/10</div>
+                                <div class="llm-comment">\${result.comment}</div>
+                            </div>
+                        \`;
+                    }).join('');
+                    llmAnalysis.innerHTML = resultsHtml;
+                } else {
+                    llmAnalysis.innerHTML = '<div class="llm-loading">No files analyzed</div>';
+                }
             }
         }
 
@@ -191,6 +234,9 @@ function getWebviewScripts() {
                     break;
                 case 'llmAnalysisStarted':
                     showLlmAnalysisLoading();
+                    break;
+                case 'llmFileComplete':
+                    addLlmFileResult(message.data);
                     break;
                 case 'llmAnalysisComplete':
                     displayLlmResults(message.data);
