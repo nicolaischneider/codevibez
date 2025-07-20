@@ -24,6 +24,23 @@ const mvvmAnalysisTool = {
     }
 };
 
+const summaryAnalysisTool = {
+    name: "summarize_project_analysis",
+    description: "Provide a general vibe check and summary based on all individual file analysis results",
+    input_schema: {
+        type: "object",
+        properties: {
+            summary: {
+                type: "string",
+                maxLength: 200,
+                description: "1-2 sentences giving a general vibe check about the overall code quality and MVVM compliance across all analyzed files"
+            }
+        },
+        required: ["summary"]
+    }
+};
+
 module.exports = {
-    mvvmAnalysisTool
+    mvvmAnalysisTool,
+    summaryAnalysisTool
 };

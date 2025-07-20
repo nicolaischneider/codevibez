@@ -159,6 +159,17 @@ function getWebviewScripts() {
             }
         }
 
+        /**
+         * Display summary results
+         */
+        function displaySummary(summaryData) {
+            const summaryContent = document.getElementById('summaryContent');
+            summaryContent.innerHTML = \`
+                <div class="summary-grade">Overall Grade: \${summaryData.averageGrade}/10</div>
+                <div class="summary-text">\${summaryData.summary}</div>
+            \`;
+        }
+
         // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
@@ -174,6 +185,9 @@ function getWebviewScripts() {
                     break;
                 case 'llmAnalysisComplete':
                     displayLlmResults(message.data);
+                    break;
+                case 'summaryComplete':
+                    displaySummary(message.data);
                     break;
             }
         });

@@ -45,6 +45,11 @@ function getWebviewTemplate() {
                 <h3>LLM Analysis Results</h3>
                 <div class="llm-analysis" id="llmAnalysis"></div>
             </div>
+
+            <div class="summary-section">
+                <h3>Summary</h3>
+                <div class="summary-content" id="summaryContent"></div>
+            </div>
         </div>
     </div>
     `;

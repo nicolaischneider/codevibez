@@ -9,7 +9,7 @@ const { calculateAnalysisStatistics } = require('./src/data/statistics');
 // Import file selection
 const { selectAndExtractFilesForAnalysis } = require('./src/data/fileSelection');
 // Import LLM analysis
-const { analyzeBatch } = require('./src/llm/batchAnalyzer');
+const { analyzeBatchWithSummary } = require('./src/llm/batchAnalyzer');
 
 /**
  * This function is called when the extension is activated
@@ -66,13 +66,22 @@ function activate(context) {
 									command: 'llmAnalysisStarted'
 								});
 								
-								// Analyze all selected files
-								const llmResults = await analyzeBatch(selectedFiles);
+								// Analyze all selected files with summary
+								const analysisWithSummary = await analyzeBatchWithSummary(selectedFiles);
 								
 								// Send LLM results to webview
 								panel.webview.postMessage({
 									command: 'llmAnalysisComplete',
-									data: llmResults
+									data: analysisWithSummary.results
+								});
+								
+								// Send summary to webview
+								panel.webview.postMessage({
+									command: 'summaryComplete',
+									data: {
+										averageGrade: analysisWithSummary.averageGrade,
+										summary: analysisWithSummary.summary
+									}
 								});
 							}
 							

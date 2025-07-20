@@ -182,6 +182,26 @@ function getWebviewStyles() {
             padding: 15px;
             text-align: center;
         }
+        .summary-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: var(--vscode-textBlockQuote-background);
+            border: 2px solid var(--vscode-textLink-foreground);
+            border-radius: 8px;
+        }
+        .summary-grade {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--vscode-textLink-foreground);
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .summary-text {
+            color: var(--vscode-foreground);
+            line-height: 1.5;
+            text-align: center;
+            font-size: 16px;
+        }
     `;
 }
 

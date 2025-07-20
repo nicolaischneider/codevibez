@@ -4,6 +4,8 @@
  */
 
 const { analyzeMvvmFiles } = require('./claudeAnalyzer');
+const { calculateAverageGrade } = require('../data/summaryCalculator');
+const { generateProjectSummary } = require('./summaryAnalyzer');
 
 /**
  * Analyze multiple file pairs and return results for each
@@ -38,6 +40,29 @@ async function analyzeBatch(selectedFiles) {
     return results;
 }
 
+/**
+ * Analyze files and generate complete summary
+ * @param {Array<{viewName: string, viewCode: string, viewModelName?: string, viewModelCode?: string}>} selectedFiles - Selected files for analysis
+ * @returns {Promise<{results: Array, averageGrade: number, summary: string}>} Complete analysis with summary
+ */
+async function analyzeBatchWithSummary(selectedFiles) {
+    // Get individual file results
+    const results = await analyzeBatch(selectedFiles);
+    
+    // Calculate average grade
+    const averageGrade = calculateAverageGrade(results);
+    
+    // Generate project summary
+    const summaryResult = await generateProjectSummary(results, averageGrade);
+    
+    return {
+        results,
+        averageGrade,
+        summary: summaryResult.summary
+    };
+}
+
 module.exports = {
-    analyzeBatch
+    analyzeBatch,
+    analyzeBatchWithSummary
 };
