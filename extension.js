@@ -6,6 +6,8 @@ const { getWebviewContent } = require('./src/ui/webview');
 const { discoverViewViewModelPairs } = require('./src/data/fileDiscovery');
 // Import statistics calculation
 const { calculateAnalysisStatistics } = require('./src/data/statistics');
+// Import file selection
+const { selectAndExtractFilesForAnalysis } = require('./src/data/fileSelection');
 
 /**
  * This function is called when the extension is activated
@@ -43,6 +45,12 @@ function activate(context) {
 							
 							// Calculate statistics using the data module
 							const analysisResults = calculateAnalysisStatistics(pairs);
+							
+							// Select and extract files for analysis
+							const selectedFiles = await selectAndExtractFilesForAnalysis(pairs);
+							
+							// Add selected files to results
+							analysisResults.selectedFiles = selectedFiles;
 							
 							// Send results to webview
 							panel.webview.postMessage({

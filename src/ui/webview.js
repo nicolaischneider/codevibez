@@ -139,6 +139,26 @@ function getWebviewContent() {
             color: var(--vscode-inputValidation-warningForeground);
             font-style: italic;
         }
+        .selected-files {
+            margin: 10px 0;
+        }
+        .selected-file-item {
+            margin: 10px 0;
+            padding: 15px;
+            background-color: var(--vscode-textBlockQuote-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+        }
+        .selected-file-name {
+            font-weight: bold;
+            color: var(--vscode-textLink-foreground);
+            margin-bottom: 5px;
+        }
+        .selected-file-info {
+            font-size: 12px;
+            color: var(--vscode-descriptionForeground);
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -173,6 +193,11 @@ function getWebviewContent() {
             <div class="pairs-section">
                 <h3>View-ViewModel Pairs</h3>
                 <div class="pairs-list" id="pairsList"></div>
+            </div>
+
+            <div class="selected-files-section">
+                <h3>Selected Files for Analysis</h3>
+                <div class="selected-files" id="selectedFiles"></div>
             </div>
         </div>
     </div>
@@ -266,6 +291,26 @@ function getWebviewContent() {
                     \`;
                 }).join('');
                 pairsList.innerHTML = pairsHtml;
+            }
+
+            // Display selected files for analysis
+            const selectedFiles = document.getElementById('selectedFiles');
+            if (data.selectedFiles && data.selectedFiles.length > 0) {
+                const selectedHtml = data.selectedFiles.map(file => {
+                    const compressionRatio = file.lineCount > 0 ? Math.round(((file.lineCount - file.compressedLines) / file.lineCount) * 100) : 0;
+                    return \`
+                        <div class="selected-file-item">
+                            <div class="selected-file-name">\${file.viewName}</div>
+                            <div class="selected-file-info">
+                                Original: \${file.lineCount} lines → Compressed: \${file.compressedLines} lines (-\${compressionRatio}%) | 
+                                \${file.viewModelName ? \`Paired with \${file.viewModelName}\` : 'No ViewModel'}
+                            </div>
+                        </div>
+                    \`;
+                }).join('');
+                selectedFiles.innerHTML = selectedHtml;
+            } else {
+                selectedFiles.innerHTML = '<p>No files selected for analysis (no files found with 80-300 lines).</p>';
             }
         }
 
