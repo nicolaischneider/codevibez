@@ -53,7 +53,7 @@ CLEAN CODE QUALITY:
 - Consistent formatting and style
 - Error handling where appropriate
 
-GRADING: A file can have perfect MVVM separation but still get a low grade for poor code quality (unclear naming, massive functions, duplication, etc.)`;
+GRADING: Put more weight on the Clean Code please.A file can have perfect MVVM separation but still get a low grade for poor code quality (unclear naming, massive functions, duplication, etc.). If it has no MVVM separation, it should still be able to get a better grade if the code quality is very good.`;
 
     return prompt;
 }
