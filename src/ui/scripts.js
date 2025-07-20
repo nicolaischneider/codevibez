@@ -164,8 +164,17 @@ function getWebviewScripts() {
          */
         function displaySummary(summaryData) {
             const summaryContent = document.getElementById('summaryContent');
+            
+            // Determine color class based on grade
+            let gradeClass = 'grade-high';
+            if (summaryData.averageGrade >= 1 && summaryData.averageGrade <= 3) {
+                gradeClass = 'grade-low';
+            } else if (summaryData.averageGrade >= 4 && summaryData.averageGrade <= 6) {
+                gradeClass = 'grade-medium';
+            }
+            
             summaryContent.innerHTML = \`
-                <div class="summary-grade">Overall Grade: \${summaryData.averageGrade}/10</div>
+                <div class="summary-grade \${gradeClass}">Overall Grade: \${summaryData.averageGrade}/10</div>
                 <div class="summary-text">\${summaryData.summary}</div>
             \`;
         }

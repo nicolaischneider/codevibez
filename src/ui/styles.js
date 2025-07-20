@@ -192,14 +192,20 @@ function getWebviewStyles() {
         .summary-grade {
             font-size: 32px;
             font-weight: bold;
-            color: var(--vscode-textLink-foreground);
-            text-align: center;
             margin-bottom: 15px;
+        }
+        .summary-grade.grade-low {
+            color: #f14c4c;
+        }
+        .summary-grade.grade-medium {
+            color: #ffcc02;
+        }
+        .summary-grade.grade-high {
+            color: #89d185;
         }
         .summary-text {
             color: var(--vscode-foreground);
             line-height: 1.5;
-            text-align: center;
             font-size: 16px;
         }
     `;
