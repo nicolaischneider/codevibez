@@ -21,7 +21,7 @@ function getWebviewTemplate() {
         <div class="analyze-controls">
             <div class="file-count-control">
                 <label for="fileCount">Files to analyze:</label>
-                <input type="number" id="fileCount" min="1" max="10" value="4" />
+                <input type="number" id="fileCount" min="1" max="20" value="4" />
             </div>
             <button class="analyze-button" id="analyzeBtn" onclick="startAnalysis()">
                 Analyze MVVM Architecture

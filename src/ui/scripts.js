@@ -217,7 +217,7 @@ function getWebviewScripts() {
             let gradeClass = 'grade-high';
             if (summaryData.averageGrade >= 1 && summaryData.averageGrade <= 3) {
                 gradeClass = 'grade-low';
-            } else if (summaryData.averageGrade >= 4 && summaryData.averageGrade <= 6) {
+            } else if (summaryData.averageGrade >= 4 && summaryData.averageGrade < 7) {
                 gradeClass = 'grade-medium';
             }
             
