@@ -9,7 +9,7 @@ const { calculateAnalysisStatistics } = require('./src/data/statistics');
 // Import file selection
 const { selectAndExtractFilesForAnalysis } = require('./src/data/fileSelection');
 // Import LLM analysis
-const { testLlmCall } = require('./src/llm/claudeAnalyzer');
+const { analyzeBatch } = require('./src/llm/batchAnalyzer');
 
 /**
  * This function is called when the extension is activated
@@ -60,19 +60,21 @@ function activate(context) {
 								data: analysisResults
 							});
 							
-							// Start LLM analysis
-							panel.webview.postMessage({
-								command: 'llmAnalysisStarted'
-							});
-							
-							// Call LLM for analysis
-							const llmResult = await testLlmCall();
-							
-							// Send LLM results to webview
-							panel.webview.postMessage({
-								command: 'llmAnalysisComplete',
-								data: llmResult
-							});
+							// Start LLM analysis if we have selected files
+							if (selectedFiles.length > 0) {
+								panel.webview.postMessage({
+									command: 'llmAnalysisStarted'
+								});
+								
+								// Analyze all selected files
+								const llmResults = await analyzeBatch(selectedFiles);
+								
+								// Send LLM results to webview
+								panel.webview.postMessage({
+									command: 'llmAnalysisComplete',
+									data: llmResults
+								});
+							}
 							
 						} catch (error) {
 							console.error('Error during analysis:', error);

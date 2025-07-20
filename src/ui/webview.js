@@ -182,6 +182,12 @@ function getWebviewContent() {
             color: var(--vscode-foreground);
             line-height: 1.4;
         }
+        .llm-file-name {
+            font-weight: bold;
+            color: var(--vscode-textLink-foreground);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
         .llm-loading {
             color: var(--vscode-descriptionForeground);
             font-style: italic;
@@ -371,16 +377,25 @@ function getWebviewContent() {
         }
 
         /**
-         * Display LLM analysis results
+         * Display LLM analysis results for multiple files
          */
-        function displayLlmResults(llmData) {
+        function displayLlmResults(llmResults) {
             const llmAnalysis = document.getElementById('llmAnalysis');
-            llmAnalysis.innerHTML = \`
-                <div class="llm-result">
-                    <div class="llm-grade">Grade: \${llmData.grade}/10</div>
-                    <div class="llm-comment">\${llmData.comment}</div>
-                </div>
-            \`;
+            
+            if (Array.isArray(llmResults) && llmResults.length > 0) {
+                const resultsHtml = llmResults.map(result => {
+                    return \`
+                        <div class="llm-result">
+                            <div class="llm-file-name">\${result.fileName}\${result.viewModelName ? \` + \${result.viewModelName}\` : ''}</div>
+                            <div class="llm-grade">Grade: \${result.grade}/10</div>
+                            <div class="llm-comment">\${result.comment}</div>
+                        </div>
+                    \`;
+                }).join('');
+                llmAnalysis.innerHTML = resultsHtml;
+            } else {
+                llmAnalysis.innerHTML = '<div class="llm-loading">No files analyzed</div>';
+            }
         }
 
         // Listen for messages from the extension
