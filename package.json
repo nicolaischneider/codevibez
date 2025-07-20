@@ -7,15 +7,26 @@
     "vscode": "^1.102.0"
   },
   "categories": [
+    "Linters",
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:swift"
+  ],
   "main": "./extension.js",
   "contributes": {
     "commands": [{
-      "command": "codevibez.helloWorld",
-      "title": "Hello World"
-    }]
+      "command": "codevibez.analyzeArchitecture",
+      "title": "CodeVibez: Analyze MVVM Architecture",
+      "category": "CodeVibez"
+    }],
+    "menus": {
+      "explorer/context": [{
+        "command": "codevibez.analyzeArchitecture",
+        "when": "resourceExtname == .swift",
+        "group": "navigation"
+      }]
+    }
   },
   "scripts": {
     "lint": "eslint .",
