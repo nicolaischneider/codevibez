@@ -24,6 +24,37 @@ function getWebviewStyles() {
             line-height: 1.6;
             color: var(--vscode-descriptionForeground);
         }
+        .analyze-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .file-count-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .file-count-control label {
+            color: var(--vscode-foreground);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        .file-count-control input[type="number"] {
+            background-color: var(--vscode-input-background);
+            color: var(--vscode-input-foreground);
+            border: 1px solid var(--vscode-input-border);
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 14px;
+            width: 60px;
+            text-align: center;
+        }
+        .file-count-control input[type="number"]:focus {
+            outline: none;
+            border-color: var(--vscode-focusBorder);
+        }
         .analyze-button {
             background-color: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
@@ -32,7 +63,6 @@ function getWebviewStyles() {
             font-size: 16px;
             border-radius: 4px;
             cursor: pointer;
-            margin: 20px 0;
         }
         .analyze-button:hover {
             background-color: var(--vscode-button-hoverBackground);

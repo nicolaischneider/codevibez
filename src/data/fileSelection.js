@@ -44,17 +44,18 @@ async function filterPairsByLineCount(pairs) {
 /**
  * Smart selection of files for analysis
  * @param {Array<{view: vscode.Uri, viewModel?: vscode.Uri, lineCount: number}>} filteredPairs - Filtered pairs
- * @returns {Array<{view: vscode.Uri, viewModel?: vscode.Uri, lineCount: number}>} Selected pairs (max 4)
+ * @param {number} maxFiles - Maximum number of files to select (default 4)
+ * @returns {Array<{view: vscode.Uri, viewModel?: vscode.Uri, lineCount: number}>} Selected pairs
  */
-function selectFilesForAnalysis(filteredPairs) {
+function selectFilesForAnalysis(filteredPairs, maxFiles = 4) {
     const withViewModels = filteredPairs.filter(pair => pair.viewModel !== null);
     const withoutViewModels = filteredPairs.filter(pair => pair.viewModel === null);
     
     const selected = [];
     
-    // Try to get 2 with ViewModels and 2 without
-    const targetWithVM = Math.min(2, withViewModels.length);
-    const targetWithoutVM = Math.min(2, withoutViewModels.length);
+    // Try to get balanced selection (roughly half with ViewModels, half without)
+    const targetWithVM = Math.min(Math.floor(maxFiles / 2), withViewModels.length);
+    const targetWithoutVM = Math.min(Math.floor(maxFiles / 2), withoutViewModels.length);
     
     // Add files with ViewModels
     for (let i = 0; i < targetWithVM; i++) {
@@ -66,8 +67,8 @@ function selectFilesForAnalysis(filteredPairs) {
         selected.push(withoutViewModels[i]);
     }
     
-    // If we have less than 4 total, fill up with remaining files
-    const remaining = 4 - selected.length;
+    // If we have less than maxFiles total, fill up with remaining files
+    const remaining = maxFiles - selected.length;
     if (remaining > 0) {
         const allRemaining = [...withViewModels.slice(targetWithVM), ...withoutViewModels.slice(targetWithoutVM)];
         for (let i = 0; i < Math.min(remaining, allRemaining.length); i++) {
@@ -162,14 +163,15 @@ async function extractCodeFromSelectedFiles(selectedPairs) {
 /**
  * Main function to select and extract files for analysis
  * @param {Array<{view: vscode.Uri, viewModel?: vscode.Uri}>} pairs - All View-ViewModel pairs
+ * @param {number} maxFiles - Maximum number of files to select (default 4)
  * @returns {Promise<Array<{viewName: string, viewCode: string, viewModelName?: string, viewModelCode?: string, lineCount: number}>>} Selected and extracted files
  */
-async function selectAndExtractFilesForAnalysis(pairs) {
+async function selectAndExtractFilesForAnalysis(pairs, maxFiles = 4) {
     // Filter by line count
     const filteredPairs = await filterPairsByLineCount(pairs);
     
-    // Smart selection
-    const selectedPairs = selectFilesForAnalysis(filteredPairs);
+    // Smart selection with dynamic limit
+    const selectedPairs = selectFilesForAnalysis(filteredPairs, maxFiles);
     
     // Extract and clean code
     const extractedFiles = await extractCodeFromSelectedFiles(selectedPairs);

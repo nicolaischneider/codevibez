@@ -15,6 +15,7 @@ function getWebviewScripts() {
             const button = document.getElementById('analyzeBtn');
             const status = document.getElementById('status');
             const results = document.getElementById('results');
+            const fileCountInput = document.getElementById('fileCount');
             
             // Reset UI
             button.disabled = true;
@@ -23,9 +24,13 @@ function getWebviewScripts() {
             status.textContent = 'Starting analysis...';
             results.style.display = 'none';
             
+            // Get file count from input
+            const fileCount = parseInt(fileCountInput.value) || 4;
+            
             // Send message to extension backend
             vscode.postMessage({
-                command: 'analyze'
+                command: 'analyze',
+                fileCount: fileCount
             });
         }
 

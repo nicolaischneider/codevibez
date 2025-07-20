@@ -41,6 +41,9 @@ function activate(context) {
 				switch (message.command) {
 					case 'analyze':
 						try {
+							// Get file count from message, default to 4
+							const fileCount = message.fileCount || 4;
+							
 							// Discover View-ViewModel pairs in the current workspace
 							console.log('Starting MVVM architecture analysis...');
 							const pairs = await discoverViewViewModelPairs();
@@ -49,7 +52,7 @@ function activate(context) {
 							const analysisResults = calculateAnalysisStatistics(pairs);
 							
 							// Select and extract files for analysis
-							const selectedFiles = await selectAndExtractFilesForAnalysis(pairs);
+							const selectedFiles = await selectAndExtractFilesForAnalysis(pairs, fileCount);
 							
 							// Add selected files to results
 							analysisResults.selectedFiles = selectedFiles;

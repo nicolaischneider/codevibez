@@ -18,9 +18,15 @@ function getWebviewTemplate() {
             </ul>
         </div>
 
-        <button class="analyze-button" id="analyzeBtn" onclick="startAnalysis()">
-            Analyze MVVM Architecture
-        </button>
+        <div class="analyze-controls">
+            <div class="file-count-control">
+                <label for="fileCount">Files to analyze:</label>
+                <input type="number" id="fileCount" min="1" max="10" value="4" />
+            </div>
+            <button class="analyze-button" id="analyzeBtn" onclick="startAnalysis()">
+                Analyze MVVM Architecture
+            </button>
+        </div>
 
         <div class="status" id="status" style="display: none;">
             Ready to analyze your Swift project...
