@@ -4,6 +4,8 @@ const vscode = require('vscode');
 const { getWebviewContent } = require('./src/ui/webview');
 // Import file discovery functionality
 const { discoverViewViewModelPairs } = require('./src/data/fileDiscovery');
+// Import statistics calculation
+const { calculateAnalysisStatistics } = require('./src/data/statistics');
 
 /**
  * This function is called when the extension is activated
@@ -39,27 +41,8 @@ function activate(context) {
 							console.log('Starting MVVM architecture analysis...');
 							const pairs = await discoverViewViewModelPairs();
 							
-							// Calculate statistics
-							const pairCount = pairs.length;
-							const viewModelCount = pairs.filter(p => p.viewModel).length;
-							const unpairedCount = pairCount - viewModelCount;
-							const percentage = pairCount > 0 ? Math.round((viewModelCount / pairCount) * 100) : 0;
-							
-							// Prepare data for webview
-							const analysisResults = {
-								pairs: pairs.map(pair => ({
-									viewName: require('path').basename(pair.view.fsPath),
-									viewModelName: pair.viewModel ? require('path').basename(pair.viewModel.fsPath) : null,
-									viewPath: pair.view.fsPath,
-									viewModelPath: pair.viewModel ? pair.viewModel.fsPath : null
-								})),
-								statistics: {
-									totalViews: pairCount,
-									viewsWithViewModels: viewModelCount,
-									viewsWithoutViewModels: unpairedCount,
-									percentage: percentage
-								}
-							};
+							// Calculate statistics using the data module
+							const analysisResults = calculateAnalysisStatistics(pairs);
 							
 							// Send results to webview
 							panel.webview.postMessage({
