@@ -15,17 +15,21 @@
   ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "codevibez.analyzeArchitecture",
-      "title": "CodeVibez: Analyze MVVM Architecture",
-      "category": "CodeVibez"
-    }],
-    "menus": {
-      "explorer/context": [{
+    "commands": [
+      {
         "command": "codevibez.analyzeArchitecture",
-        "when": "resourceExtname == .swift",
-        "group": "navigation"
-      }]
+        "title": "CodeVibez: Analyze MVVM Architecture",
+        "category": "CodeVibez"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "codevibez.analyzeArchitecture",
+          "when": "resourceExtname == .swift",
+          "group": "navigation"
+        }
+      ]
     }
   },
   "scripts": {
@@ -34,11 +38,15 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.102.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "eslint": "^9.25.1",
+    "@types/vscode": "^1.102.0",
     "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.56.0",
+    "dotenv": "^17.2.0"
   }
 }

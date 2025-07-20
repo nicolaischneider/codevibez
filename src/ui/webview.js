@@ -159,6 +159,35 @@ function getWebviewContent() {
             color: var(--vscode-descriptionForeground);
             margin-bottom: 5px;
         }
+        .llm-analysis-section {
+            margin: 20px 0;
+        }
+        .llm-analysis {
+            margin: 10px 0;
+        }
+        .llm-result {
+            padding: 15px;
+            background-color: var(--vscode-textBlockQuote-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .llm-grade {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--vscode-textLink-foreground);
+            margin-bottom: 10px;
+        }
+        .llm-comment {
+            color: var(--vscode-foreground);
+            line-height: 1.4;
+        }
+        .llm-loading {
+            color: var(--vscode-descriptionForeground);
+            font-style: italic;
+            padding: 15px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -198,6 +227,11 @@ function getWebviewContent() {
             <div class="selected-files-section">
                 <h3>Selected Files for Analysis</h3>
                 <div class="selected-files" id="selectedFiles"></div>
+            </div>
+
+            <div class="llm-analysis-section">
+                <h3>LLM Analysis Results</h3>
+                <div class="llm-analysis" id="llmAnalysis"></div>
             </div>
         </div>
     </div>
@@ -328,6 +362,27 @@ function getWebviewContent() {
             status.style.borderLeft = '4px solid var(--vscode-errorForeground)';
         }
 
+        /**
+         * Show LLM analysis loading state
+         */
+        function showLlmAnalysisLoading() {
+            const llmAnalysis = document.getElementById('llmAnalysis');
+            llmAnalysis.innerHTML = '<div class="llm-loading">Analyzing code...</div>';
+        }
+
+        /**
+         * Display LLM analysis results
+         */
+        function displayLlmResults(llmData) {
+            const llmAnalysis = document.getElementById('llmAnalysis');
+            llmAnalysis.innerHTML = \`
+                <div class="llm-result">
+                    <div class="llm-grade">Grade: \${llmData.grade}/10</div>
+                    <div class="llm-comment">\${llmData.comment}</div>
+                </div>
+            \`;
+        }
+
         // Listen for messages from the extension
         window.addEventListener('message', event => {
             const message = event.data;
@@ -337,6 +392,12 @@ function getWebviewContent() {
                     break;
                 case 'analysisError':
                     displayError(message.error);
+                    break;
+                case 'llmAnalysisStarted':
+                    showLlmAnalysisLoading();
+                    break;
+                case 'llmAnalysisComplete':
+                    displayLlmResults(message.data);
                     break;
             }
         });
