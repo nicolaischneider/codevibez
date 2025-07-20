@@ -60,6 +60,85 @@ function getWebviewContent() {
             background-color: var(--vscode-textBlockQuote-background);
             border-left: 4px solid var(--vscode-textLink-foreground);
         }
+        .results {
+            margin: 20px 0;
+        }
+        .results h2 {
+            color: var(--vscode-textLink-foreground);
+            border-bottom: 1px solid var(--vscode-panel-border);
+            padding-bottom: 8px;
+        }
+        .results h3 {
+            color: var(--vscode-foreground);
+            margin: 20px 0 10px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--vscode-textBlockQuote-background);
+            border-radius: 4px;
+            border: 1px solid var(--vscode-panel-border);
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--vscode-textLink-foreground);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--vscode-descriptionForeground);
+            margin-top: 5px;
+        }
+        .pairs-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+        }
+        .pair-item {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid var(--vscode-panel-border);
+            align-items: center;
+        }
+        .pair-item:last-child {
+            border-bottom: none;
+        }
+        .pair-item.has-viewmodel {
+            background-color: var(--vscode-textBlockQuote-background);
+        }
+        .pair-item.missing-viewmodel {
+            background-color: var(--vscode-inputValidation-warningBackground);
+        }
+        .view-info, .viewmodel-info {
+            min-width: 0;
+        }
+        .view-info strong, .viewmodel-info strong {
+            color: var(--vscode-textLink-foreground);
+        }
+        .file-path {
+            font-size: 11px;
+            color: var(--vscode-descriptionForeground);
+            word-break: break-all;
+            margin-top: 4px;
+        }
+        .arrow {
+            font-size: 18px;
+            text-align: center;
+            color: var(--vscode-textLink-foreground);
+        }
+        .missing {
+            color: var(--vscode-inputValidation-warningForeground);
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -85,6 +164,17 @@ function getWebviewContent() {
         <div class="status" id="status" style="display: none;">
             Ready to analyze your Swift project...
         </div>
+
+        <div class="results" id="results" style="display: none;">
+            <h2>Analysis Results</h2>
+            
+            <div class="statistics" id="statistics"></div>
+            
+            <div class="pairs-section">
+                <h3>View-ViewModel Pairs</h3>
+                <div class="pairs-list" id="pairsList"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -98,25 +188,113 @@ function getWebviewContent() {
         function startAnalysis() {
             const button = document.getElementById('analyzeBtn');
             const status = document.getElementById('status');
+            const results = document.getElementById('results');
             
-            // Disable button and show status
+            // Reset UI
             button.disabled = true;
             button.textContent = 'Analyzing...';
             status.style.display = 'block';
             status.textContent = 'Starting analysis...';
+            results.style.display = 'none';
             
             // Send message to extension backend
             vscode.postMessage({
                 command: 'analyze'
             });
-            
-            // Re-enable button after a moment (for demo purposes)
-            setTimeout(() => {
-                button.disabled = false;
-                button.textContent = 'Analyze MVVM Architecture';
-                status.textContent = 'Analysis complete! (Functionality coming soon)';
-            }, 2000);
         }
+
+        /**
+         * Display analysis results in the webview
+         */
+        function displayResults(data) {
+            const button = document.getElementById('analyzeBtn');
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            const statistics = document.getElementById('statistics');
+            const pairsList = document.getElementById('pairsList');
+
+            // Update button and hide status
+            button.disabled = false;
+            button.textContent = 'Analyze MVVM Architecture';
+            status.style.display = 'none';
+            results.style.display = 'block';
+
+            // Display statistics
+            const stats = data.statistics;
+            statistics.innerHTML = \`
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">\${stats.totalViews}</div>
+                        <div class="stat-label">Total Views</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">\${stats.viewsWithViewModels}</div>
+                        <div class="stat-label">With ViewModels</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">\${stats.viewsWithoutViewModels}</div>
+                        <div class="stat-label">Missing ViewModels</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">\${stats.percentage}%</div>
+                        <div class="stat-label">MVVM Compliance</div>
+                    </div>
+                </div>
+            \`;
+
+            // Display pairs
+            if (data.pairs.length === 0) {
+                pairsList.innerHTML = '<p>No Swift View files found in the workspace.</p>';
+            } else {
+                const pairsHtml = data.pairs.map(pair => {
+                    const hasViewModel = pair.viewModelName !== null;
+                    return \`
+                        <div class="pair-item \${hasViewModel ? 'has-viewmodel' : 'missing-viewmodel'}">
+                            <div class="view-info">
+                                <strong>\${pair.viewName}</strong>
+                                <div class="file-path">\${pair.viewPath}</div>
+                            </div>
+                            <div class="arrow">\${hasViewModel ? '→' : '✗'}</div>
+                            <div class="viewmodel-info">
+                                \${hasViewModel ? 
+                                    \`<strong>\${pair.viewModelName}</strong>
+                                     <div class="file-path">\${pair.viewModelPath}</div>\` : 
+                                    '<span class="missing">No ViewModel</span>'
+                                }
+                            </div>
+                        </div>
+                    \`;
+                }).join('');
+                pairsList.innerHTML = pairsHtml;
+            }
+        }
+
+        /**
+         * Display error message
+         */
+        function displayError(errorMessage) {
+            const button = document.getElementById('analyzeBtn');
+            const status = document.getElementById('status');
+            
+            button.disabled = false;
+            button.textContent = 'Analyze MVVM Architecture';
+            status.style.display = 'block';
+            status.textContent = \`Error: \${errorMessage}\`;
+            status.style.borderLeft = '4px solid var(--vscode-errorForeground)';
+        }
+
+        // Listen for messages from the extension
+        window.addEventListener('message', event => {
+            const message = event.data;
+            switch (message.command) {
+                case 'analysisComplete':
+                    displayResults(message.data);
+                    break;
+                case 'analysisError':
+                    displayError(message.error);
+                    break;
+            }
+        });
     </script>
 </body>
 </html>`;

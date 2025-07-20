@@ -39,22 +39,40 @@ function activate(context) {
 							console.log('Starting MVVM architecture analysis...');
 							const pairs = await discoverViewViewModelPairs();
 							
-							// Show results in an information message for now
+							// Calculate statistics
 							const pairCount = pairs.length;
 							const viewModelCount = pairs.filter(p => p.viewModel).length;
 							const unpairedCount = pairCount - viewModelCount;
+							const percentage = pairCount > 0 ? Math.round((viewModelCount / pairCount) * 100) : 0;
 							
-							const message = `Analysis complete! Found ${pairCount} Views, ${viewModelCount} with ViewModels, ${unpairedCount} without ViewModels.`;
-							vscode.window.showInformationMessage(message);
+							// Prepare data for webview
+							const analysisResults = {
+								pairs: pairs.map(pair => ({
+									viewName: require('path').basename(pair.view.fsPath),
+									viewModelName: pair.viewModel ? require('path').basename(pair.viewModel.fsPath) : null,
+									viewPath: pair.view.fsPath,
+									viewModelPath: pair.viewModel ? pair.viewModel.fsPath : null
+								})),
+								statistics: {
+									totalViews: pairCount,
+									viewsWithViewModels: viewModelCount,
+									viewsWithoutViewModels: unpairedCount,
+									percentage: percentage
+								}
+							};
 							
-							// Log detailed results to console
-							console.log(`Analysis results: ${pairCount} total Views`);
-							console.log(`${viewModelCount} Views have matching ViewModels`);
-							console.log(`${unpairedCount} Views are missing ViewModels`);
+							// Send results to webview
+							panel.webview.postMessage({
+								command: 'analysisComplete',
+								data: analysisResults
+							});
 							
 						} catch (error) {
 							console.error('Error during analysis:', error);
-							vscode.window.showErrorMessage(`Analysis failed: ${error.message}`);
+							panel.webview.postMessage({
+								command: 'analysisError',
+								error: error.message
+							});
 						}
 						return;
 				}
